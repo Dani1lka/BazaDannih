@@ -7,7 +7,7 @@
       <input type="text" id="name" name="" v-model.trim="name">
     </div>
     <button class="btn primary" :disabled="name.length===0">Создать</button>
-    <app-people-list :people="people"></app-people-list>
+    <app-people-list :people="people" @load="loadPeople"></app-people-list>
   </form>
 </div>
 </template>
@@ -16,6 +16,7 @@
 
 
 import appPeopleList from './appPeopleList.vue'
+import axios from 'axios'
 export default {
   
   name: 'App',
@@ -39,6 +40,10 @@ export default {
       const firebaseData = await response.json()
       console.log(firebaseData);
       this.name = ''
+    },
+     async loadPeople(){
+      const response = await axios.get('https://bazadanih-b3b73-default-rtdb.firebaseio.com/people.json')
+      console.log(response);
     },
   },
   components:{appPeopleList}
