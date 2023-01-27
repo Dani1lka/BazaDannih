@@ -7,7 +7,7 @@
         <h3>{{person}}</h3>
         </div>
 </div>
-<div class="card center" v-else>
+<div class="card center">
     <h4>Людей пока нет</h4>
     <button class="btn primary" @click="$emit('load')">Загрузить список</button>
 </div>

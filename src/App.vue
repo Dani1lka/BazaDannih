@@ -42,8 +42,13 @@ export default {
       this.name = ''
     },
      async loadPeople(){
-      const response = await axios.get('https://bazadanih-b3b73-default-rtdb.firebaseio.com/people.json')
-      console.log(response);
+      const {data} = await axios.get('https://bazadanih-b3b73-default-rtdb.firebaseio.com/people.json')
+      this.people = Object.keys(data).map(key=>{
+        return{
+          id:key,
+          firstName: data[key].firstName
+        }
+      })
     },
   },
   components:{appPeopleList}
