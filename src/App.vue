@@ -8,7 +8,8 @@
       <input type="text" id="name" name="" v-model.trim="name">
     </div>
     <button class="btn primary" :disabled="name.length===0">Создать</button>
-    <app-people-list :people="people" @load="loadPeople" @remove="removePerson"></app-people-list>
+    <app-loader v-if="loading"></app-loader>
+    <app-people-list :people="people" @load="loadPeople" @remove="removePerson" v-else></app-people-list>
     
   </form>
 </div>
@@ -19,6 +20,7 @@
 
 import appPeopleList from './appPeopleList.vue'
 import AppAlert from './AppAlert.vue'
+import AppLoader from './AppLoader.vue'
 import axios from 'axios'
 export default {
   
@@ -26,7 +28,9 @@ export default {
   data(){
    return{
     name: '',
-    people: []
+    people: [],
+    alert: null,
+    loading: false,
    }
   },
   methods:{
@@ -46,6 +50,7 @@ export default {
     },
      async loadPeople(){
       try{
+        this.loading = true
       const {data} = await axios.get('https://bazadanih-b3b73-default-rtdb.firebaseio.com/people.json')
       if(!data){
         throw new Error("Список пуст")
@@ -56,20 +61,33 @@ export default {
                 firstName: data[key].firstName,
               }
             })
+            this.loading = false
       }catch(error){
       this.alert = {
         type: 'danger',
         title: 'Ошибка',
         text: error.message,
       }
+      this.loading = false
       }
     },
     async removePerson(id){
-      await axios.delete(`https://bazadanih-b3b73-default-rtdb.firebaseio.com/people/${id}.json`)
-      this.people = this.people.filter(person => person.id !== id)
+      try{
+        let name = this.people.find(person => person.id === id).firstName
+        await axios.delete(`https://bazadanih-b3b73-default-rtdb.firebaseio.com/people/${id}.json`)
+        this.people = this.people.filter(person => person.id !== id)
+        this.alert ={
+          type:'primary',
+          title: 'Успешно',
+          text: `Пользователь с именем "${name}" был удален`,
+        }
+      }catch(error){
+        this.alert('ALAAAAAAAAAAAAAAAAAAAARM')
+      }
+      
     },
   },
-  components:{appPeopleList}
+  components:{appPeopleList, AppAlert,AppLoader}
 }
 </script>
 
